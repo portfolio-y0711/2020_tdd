@@ -9,7 +9,7 @@ const MustacheRenderer = (() => {
             const raw = fs.readFileSync(viewPath + viewName + '.' + extName).toString();
             return render(filePath, options);
         }
-    const render = (filePath: string, options: any) => {
+    const render = (filePath: string, options?: any) => {
         const raw = fs.readFileSync(filePath).toString();
         return mustache.render(raw, options);
     };
@@ -20,7 +20,8 @@ const MustacheRenderer = (() => {
 })();
 
 const home_page = () => {
-    return '<html><title>To-Do lists</title>ok</html>';
+    // return '<html><title>To-Do lists</title>ok</html>';
+    return MustacheRenderer.render('./src/views/home.mu');
 }
 
 export { MustacheRenderer, home_page }

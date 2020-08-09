@@ -10,8 +10,9 @@ describe('HomePageTest', () => {
     });
 
     it('test_home_page_returns_correct_html', () => {
+        console.log(home_page());
         home_page().should.startWith('<html>');
         home_page().includes('<title>To-Do lists</title>').should.be.true();
-        home_page().should.endWith('</html>');
+        home_page().trim().should.endWith('</html>');
     });
 });
