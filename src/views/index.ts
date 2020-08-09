@@ -19,9 +19,9 @@ const MustacheRenderer = (() => {
     }
 })();
 
-const home_page = () => {
-    // return '<html><title>To-Do lists</title>ok</html>';
-    return MustacheRenderer.render('./src/views/home.mu');
+const home_page = (options?: any) => {
+    if (options.item_text) return MustacheRenderer.render('./src/views/home.mu', options);
+    else return MustacheRenderer.render('./src/views/home.mu', options);
 }
 
 export { MustacheRenderer, home_page }
