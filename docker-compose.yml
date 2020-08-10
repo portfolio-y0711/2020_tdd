@@ -1,0 +1,18 @@
+version: "3"
+services:
+  mysql:
+    environment: 
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_PORT=${MYSQL_PORT}
+      - MYSQL_DATABASE={MYSQL_DATABASE}
+    container_name: my_mysql
+    image: mysql:5.7
+    command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+    volumes:
+      - /var/lib/docker/volumes/v_mysql/_data:/var/lib/mysql
+    ports: 
+      - ${MYSQL_PORT}:3306
+    env_file: 
+      - .env

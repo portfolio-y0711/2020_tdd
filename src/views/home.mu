@@ -7,9 +7,9 @@
             <input type="text" name="item_text" id="id_new_item" placeholder="작업 아이템 입력">
         </form>
         <table id="id_list_table">
-            <tr>
-                <td>1: {{ item_text }}</td>
-            </tr>
+            {{#items}}
+            <tr> <td>{{index}}: {{text}}</td> </tr>
+            {{/items}}
         </table>
     </body>
 </html>

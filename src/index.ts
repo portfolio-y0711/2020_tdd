@@ -1,12 +1,13 @@
-import express from 'express';
+import express, { NextFunction } from 'express';
 import { resolve } from './util';
 import cookieParser from 'cookie-parser';
 import csrf from 'csurf';
 import bodyParser from 'body-parser';
 import { home_page, MustacheRenderer } from './views';
+import { createConnection, Repository } from 'typeorm';
+import { config } from '../typeorm.config';
 
-const app = express();
-
+export const app = express();
 
 // app.set('views', './src/views');
 // app.engine('mu', (filePath: any, options: any, callback: any) => {
@@ -15,35 +16,67 @@ const app = express();
 // });
 // app.set('view engine', 'mu');
 
-app.use(cookieParser());
-app.use(express.urlencoded({ extended: false }))
+// app.use(cookieParser());
+// app.use(express.urlencoded({ extended: false }))
 
-const router = express.Router();
-const csrfProtection = csrf({ cookie: true });
+const handles = (app: any) => {
+    app.use(cookieParser());
+    app.use(express.urlencoded({ extended: false }))
+}
+handles(app);
 
-router.get('/', csrfProtection, (req: any, res: any) => {
-    const result = resolve('/')({ csrfToken: req.csrfToken() });
-    res.send(result);
-});
+export const setDBContext = async () => {
+    const db = await createConnection(config);
+};
 
-router.post('/', csrfProtection, (req: express.Request, res: any) => {
-    const result = resolve('/')(Object.assign({}, req.body, { csrfToken: req.csrfToken() }));
-    console.log(Object.assign({}, req.body, { csrfToken: req.csrfToken() }));
-    res.send(result);
-});
+(async () => {
+    await setDBContext();
+})();
 
-// router.get('/form', csrfProtection, (req: any, res: any) => {
-    // const result = resolve('/')();
-    // res.send(result, { scrfToken: req.csrfToken() });
-    // res.render('send', { csrfToken: req.csrfToken() })
-//     res.render('send', { csrfToken: req.csrfToken() })
-// });
+export const routes = (app: any) => {
+    const router = express.Router();
+    const csrfProtection = csrf({ cookie: true });
+    let token: any;
 
+    router.get('/', csrfProtection, async (req: any, res: any) => {
+        token = req.csrfToken();
+        // console.log(token);
+        const result = await resolve('/')({ csrfToken: token });
+        // const re = new RegExp(/"_csrf"\s+value="(.+)">/);
+        // console.log(result);
+        // console.log(re.exec(result)![1]);
+        res.send(result);
+    });
 
-app.use('/', router);
+    // router.post('/', csrfProtection, async(req: express.Request, res: any) => {
+    //     console.log(req.body);
+    //     try{
+    //         const result = await (await resolve('/'))(Object.assign({}, req.body, { csrfToken: req.csrfToken() }));
+    //         res.send(result);
+    //     } catch(e) {
+    //         console.log(e);
+    //     }
+    // });
+
+    router.post('/', function (req: express.Request, res: any, next: NextFunction) {
+        if ((req.get('csrf-token')! !== token) && (req.body._csrf !== token)) {
+            next(new Error('csrf-error'));
+        }
+        next();
+    }, (err: any, req: any, res: any, next: NextFunction) => {
+        res.status(401).send('unauthorized');
+    }, async (req: any, res: express.Response) => {
+        const result = await (await resolve('/'))(Object.assign({}, req.body, { csrfToken: token }));
+        res.status(302).redirect('/');
+    });
+
+    app.use('/', router);
+};
+
+routes(app);
+
 
 app.listen(5000, () => {
     console.log('server is running at 5000');
 });
-
 

@@ -1,10 +1,15 @@
+#-*- coding: utf-8 -*-
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import unittest
+import os
+
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
+
 
 class NewVisitorTest(unittest.TestCase):
     def setUp(self):
-        self.browser = webdriver.Chrome('chromedriver')
+        self.browser = webdriver.Chrome(ROOT_DIR + '/chromedriver')
         self.browser.implicitly_wait(1)
 
     def tearDown(self):

@@ -14,5 +14,7 @@ module.exports = {
     //     "node"
     // ],
     // collectCoverage: true
+    globalSetup: "./src/test-utils/setup-db.ts",
+    setupFilesAfterEnv: ["./src/test-utils/db-env.ts"],
   };
   
