@@ -57,8 +57,11 @@ describe('HomePageTest', () => {
 });
 describe('test2', () => {
     it('test_home_page_displays_all_list_items', async(done) => {
-        await home_page({ item_text: '아이템1' });
-        await home_page({ item_text: '아이템2' });
+        // await home_page({ item_text: '아이템1' });
+        // await home_page({ item_text: '아이템2' });
+        const repo = getRepository(Item);
+        await repo.save({ text: '아이템1'});
+        await repo.save({ text: '아이템2'});
         const response = await home_page({});
         (response as string).includes('아이템1').should.be.true();
         (response as string).includes('아이템2').should.be.true();

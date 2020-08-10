@@ -29,9 +29,9 @@ export const setDBContext = async () => {
     const db = await createConnection(config);
 };
 
-(async () => {
-    await setDBContext();
-})();
+// (async () => {
+//     await setDBContext();
+// })();
 
 export const routes = (app: any) => {
     const router = express.Router();
@@ -76,7 +76,7 @@ export const routes = (app: any) => {
 routes(app);
 
 
-app.listen(5000, () => {
-    console.log('server is running at 5000');
-});
+// app.listen(5000, () => {
+//     console.log('server is running at 5000');
+// });
 
