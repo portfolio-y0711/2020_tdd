@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "start": "npx nodemon -e ts -i 'tsconfig.json' -x 'npx ts-node src/index.ts'",
-    "test": "npx jest --detectOpenHandles --forceExit"
+    "test": "npx jest --detectOpenHandles --forceExit && python3 __tests__/functional_test.py",
+    "unit": "npx jest --detectOpenHandles --forceExit"
   },
   "dependencies": {
     "@types/csrf": "^1.3.2",
