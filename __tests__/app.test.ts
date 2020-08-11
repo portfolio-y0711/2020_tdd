@@ -3,10 +3,8 @@ import { home_page } from '../src/views'
 import { resolve } from '../src/util';
 import { getRepository } from 'typeorm';
 import { Item } from '../src/models/item.entity';
-import { app } from '../src/test-utils/server-env';
+import { app } from '../src/app';
 import request, { Response } from 'supertest';
-import { app as APP } from '../src/index';
-import { isJSDocParameterTag } from 'typescript';
 
 describe('HomePageTest', () => {
     it('test_root_url_resolves_to_home_page_view', () => {
@@ -15,22 +13,22 @@ describe('HomePageTest', () => {
     });
 
     it('test_home_page_returns_correct_html', async () => {
-        (await home_page({ item_text: '신규 작업 아이템' })).includes('신규 작업 아이템').should.be.true();
+        (await home_page({ item_text: '렌더링 테스트' })).includes('렌더링 테스트').should.be.true();
     });
 
     it('test_home_page_can_save_a_POST_request', async () => {
-        await home_page({ item_text: '신규 작업 아이템' });
+        await home_page({ item_text: '신규 아이템' });
         const repo = getRepository(Item);
         (await repo.find()).length.should.equal(1);
         const new_item = (await repo.find())[0];
-        new_item.text!.should.equal('신규 작업 아이템');
+        new_item.text!.should.equal('신규 아이템');
 
     });
 
     describe('test_home_page_redirects_after_POST', () => {
         let token: string;
         beforeAll((done) => {
-            request(APP)
+            request(app)
                 .get('/')
                 .end((err, res: Response) => {
                     const re = new RegExp(/"_csrf"\s+value="(.+)">/);
@@ -39,7 +37,7 @@ describe('HomePageTest', () => {
                 })
         });
         it('will process your request', (done) => {
-            request(APP)
+            request(app)
                 .post('/')
                 .type('form')
                 .send({ _csrf: token, item_text: '신규 아이템' })
@@ -53,15 +51,15 @@ describe('HomePageTest', () => {
                 });
         })
     });
-
 });
-describe('test2', () => {
-    it('test_home_page_displays_all_list_items', async(done) => {
+
+describe('HomePageTest', () => {
+    it('test_home_page_displays_all_list_items', async (done) => {
         // await home_page({ item_text: '아이템1' });
         // await home_page({ item_text: '아이템2' });
         const repo = getRepository(Item);
-        await repo.save({ text: '아이템1'});
-        await repo.save({ text: '아이템2'});
+        await repo.save({ text: '아이템1' });
+        await repo.save({ text: '아이템2' });
         const response = await home_page({});
         (response as string).includes('아이템1').should.be.true();
         (response as string).includes('아이템2').should.be.true();
@@ -77,23 +75,40 @@ describe('MiddlewareTest', () => {
             request(app)
                 .get('/')
                 .end((err, res: Response) => {
-                    token = res.text.replace(/"/gi, '');
+                    const re = new RegExp(/"_csrf"\s+value="(.+)">/);
+                    token = re.exec(res.text)![1];
                     done();
                 })
         });
 
-        describe('POST / <= if you send a form with csrfToken', () => {
+        describe('POST / <= if you send a form WITH csrfToken', () => {
             it('will process your request', (done) => {
                 request(app)
                     .post('/')
                     .type('form')
-                    .set('CSRF-Token', token)
                     .send({ _csrf: token, item_text: '신규 아이템' })
-                    .expect(202)
+                    .expect(302)
                     .then((res: Response) => {
+                        expect(res.get('location')).toBe('/');
                         done();
                     })
                     .catch(e => {
+                        done(e);
+                    });
+            })
+        })
+
+        describe('POST / <= if you send a form WITHOUT csrfToken', () => {
+            it('will NOT process your request', (done) => {
+                request(app)
+                    .post('/')
+                    .type('form')
+                    .send({ item_text: '신규 아이템' })
+                    .then((res: Response) => {
+                        res.status.should.equal(401);
+                        res.text.should.equal('unauthorized');
+                        done();
+                    }).catch(e=>{
                         done(e);
                     });
             })
