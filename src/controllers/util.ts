@@ -5,7 +5,7 @@ import { MustacheRenderer } from '../views';
 
 const routeTable: { [key: string]: string } = {
     '/': 'views.home_page',
-    '/lists/the-only-list-in-the-world': 'views.view_list'
+    '/lists': 'views.view_list'
 };
 
 export const viewResolver = (url: string): { (options?: any) : Promise<string> } => {

@@ -69,14 +69,15 @@ class NewVisitorTest(TestCase):
         self.assertRegex(francis_list_url, '/lists/.+')
         self.assertNotEqual(francis_list_url, edith_list_url)
 
-        import time
-        time.sleep(10)
-
         page_text = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn('공작깃털 사기', page_text)
+
         self.assertIn('우유 사기', page_text)
 
         self.fail('Finish the Test')
+
+        import time
+        time.sleep(3)
 
 
 if __name__ == '__main__':

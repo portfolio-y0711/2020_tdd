@@ -1,8 +1,6 @@
 
-import { Item } from "../models/item.entity";
 import { Connection, getConnection } from "typeorm";
-import { createDatabaseConnection } from "../repositories/db";
-import { List } from "../models/list.entity";
+import { createDatabaseConnection } from "../../repositories/db";
 
 beforeAll(async (done) => {
     try {
@@ -21,8 +19,6 @@ afterAll(async (done) => {
 
 afterEach(async (done) => {
     try {
-        await getConnection().getRepository(Item).delete({});
-        await getConnection().getRepository(List).delete({});
         done();
     } catch(e) {
         done(e);

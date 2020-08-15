@@ -3,7 +3,7 @@ require("tsconfig-paths/register")
 // import "dotenv/config"
 import { createConnection } from "typeorm"
 import { ConnectionOptions } from "typeorm"
-import { config } from "../repositories/typeorm.config"
+import { config } from "../../repositories/typeorm.config";
 
 /*
  * This file is executed by Jest before running any tests.

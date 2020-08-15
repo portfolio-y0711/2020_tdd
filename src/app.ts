@@ -1,11 +1,11 @@
-import express, { NextFunction } from 'express';
+import express, { NextFunction, Router } from 'express';
 import { viewResolver } from './controllers/util';
-import cookieParser from 'cookie-parser';
-import csrf from 'csurf';
 import { createConnection, getRepository } from 'typeorm';
-import { config } from '../typeorm.config';
-import { register } from 'ts-node';
-import { Item } from './models/item.entity';
+import { config } from './repositories/typeorm.config';
+import cookieParser from 'cookie-parser';
+import { Item, List } from './models/entities';
+import lusca from 'lusca';
+import session from 'express-session';
 
 export const APP = (() => {
     const init = (() => {
@@ -13,8 +13,8 @@ export const APP = (() => {
             await createConnection(config);
         };
         const up = async () => {
-                await createDbContext();
-                server.listen(5000, () => {
+            await createDbContext();
+            server.listen(5000, () => {
                 console.log('server is running at 5000');
             });
         }
@@ -28,66 +28,69 @@ export const APP = (() => {
             up,
         };
     });
-    const start = async() => {
+    const start = async () => {
         await init().up();
     };
 
     const setHandlers = (app: any) => {
         app.use(cookieParser());
         app.use(express.urlencoded({ extended: false }))
+        app.use(session({
+            secret: 'ssh, don\'t tell!',
+            resave: false,
+            saveUninitialized: true
+        }));
+        app.use(lusca({ csrf: true }));
     };
 
 
     const setRoutes = (app: any) => {
-        const router = express.Router();
-        const csrfProtection = csrf({ cookie: true });
-        let token: any;
+        const listRouter = Router();
+        const itemRouter = Router({ mergeParams: true });
+        listRouter.use('/lists/:id', itemRouter);
 
-        router.get('/lists/the-only-list-in-the-world', csrfProtection, async (req: any, res: any) => {
-            token = req.csrfToken();
-            const resolve = viewResolver('/lists/the-only-list-in-the-world');
-            const result = await resolve({ csrfToken: token });
-            res.send(result);
+        listRouter.get('/', async (req: any, res: any, next: express.NextFunction) => {
+            const result = await viewResolver('/')({ csrfToken: res.locals._csrf });
+            res.status(200).send(result);
         });
 
-        router.post('/lists/new', function (req: express.Request, res: any, next: NextFunction) {
-            if ((req.get('csrf-token')! !== token) && (req.body._csrf !== token)) {
-                next(new Error('csrf-error'));
-            }
-            next();
-        }, (err: any, req: any, res: any, next: NextFunction) => {
-            res.status(401).send('unauthorized');
-            throw(err);
-        }, async (req: express.Request, res: express.Response) => {
+        listRouter.post('/lists/new', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
             const { item_text } = req.body;
-            const repo = getRepository(Item);
-            const item = repo.create({ text: item_text });
-            await repo.save(item);
-            // const resolve = viewResolver('/lists/new');
-            // const result = await resolve(Object.assign({}, req.body, { csrfToken: token }));
-            res.status(302).redirect('/lists/the-only-list-in-the-world');
-        });
-        
-        router.get('/', csrfProtection, async (req: any, res: any) => {
-            token = req.csrfToken();
-            const result = await viewResolver('/')({ csrfToken: token });
-            res.send(result);
+            const new_list = await getRepository(List).save({});
+            const item = await getRepository(Item).save({ text: item_text, list: new_list });
+            res.status(302).redirect(`/lists/${new_list.id}`);
         });
 
-        // router.post('/', function (req: express.Request, res: any, next: NextFunction) {
-        //     if ((req.get('csrf-token')! !== token) && (req.body._csrf !== token)) {
-        //         next(new Error('csrf-error'));
-        //     }
-        //     next();
-        // }, (err: any, req: any, res: any, next: NextFunction) => {
-        //     res.status(401).send('unauthorized');
-        //     throw(err);
-        // }, async (req: any, res: express.Response) => {
-        //     const result = await (await getResolver('/'))(Object.assign({}, req.body, { csrfToken: token }));
-        //     res.status(302).redirect('/lists/the-only-list-in-the-world');
-        // });
 
-        app.use('/', router);
+        listRouter.get('/lists/:id', async (req: express.Request, res: any, next: NextFunction) => {
+            const { id: list_of_id_to_find } = req.params;
+            const list = await getRepository(List)
+                .createQueryBuilder('list')
+                .where('list.id=:id', { id: `${list_of_id_to_find}` })
+                .getOne();
+            if (list) {
+                const items = await getRepository(Item)
+                    .createQueryBuilder('item')
+                    .innerJoin('item.list', 'list')
+                    .where('item.list = :id', { id: `${list!.id}` })
+                    .getMany();
+                const result = await viewResolver('/lists')({ csrfToken: res.locals._csrf, items, id: `${list!.id}` });
+                res.send(result);
+            } else {
+                next(new Error('no user by that name'));
+            }
+        });
+
+        itemRouter.post('/add_item', async (req: express.Request, res: express.Response, next: NextFunction) => {
+            const { id } = req.params;
+            const { item_text } = req.body;
+            const searched_list = await getRepository(List).findOne(id);
+            const { id: listId } = searched_list!;
+            await getRepository(Item).save({ text: item_text, list: searched_list });
+            res.status(302).redirect(`/lists/${listId}`);
+        });
+
+        app.use('/', listRouter);
     };
     return {
         init,

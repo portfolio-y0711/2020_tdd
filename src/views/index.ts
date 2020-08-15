@@ -21,20 +21,15 @@ const MustacheRenderer = (() => {
 })();
 
 const home_page: (options?: any) => Promise<string> = async (options?: any) => {
-    if (options && options.item_text) {
-        const repo = getRepository(Item);
-        const item = repo.create({ text: options.item_text });
-        await repo.save(item);
-    }
     return MustacheRenderer.render('./src/views/home.mu', options);
 }
 
 const view_list: (options?: any) => Promise<string> = async (options?: any) => {
     const repo = getRepository(Item);
-    const _items = await repo.find();
+    // const _items = await repo.find();
     let idx = 1;
-    options = Object.assign({}, options, { items: _items, index: () => idx++ });
-    return MustacheRenderer.render('./src/views/view.mu', options);
+    options = Object.assign({}, options, { index: () => idx++ });
+    return MustacheRenderer.render('./src/views/list.mu', options);
 };
 
 export { home_page, view_list }

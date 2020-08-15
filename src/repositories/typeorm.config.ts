@@ -1,5 +1,7 @@
 const dotenv = require('dotenv');
+import path from 'path';
 import { ConnectionOptions } from 'typeorm';
+
 
 dotenv.config({
     path: './.env'
@@ -22,7 +24,8 @@ export const config: ConnectionOptions = {
     database: MYSQL_DATABASE,
     dropSchema: true,
     entities: [
-        __dirname + '/src/models/*.entity{.ts,.js}',
+        'src/models/*.entity{.ts,.js}',
     ],
     synchronize: true
 };
+

@@ -1,10 +1,16 @@
-import { Entity, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import {
+    Entity,
+    ManyToOne,
+    PrimaryColumn
+} from "typeorm";
+
+import { List } from "./list.entity";
 
 @Entity()
 export class Item {
-    @PrimaryGeneratedColumn()
-    id!: string
-
     @PrimaryColumn()
-    text?: string
+    text?: string;
+
+    @ManyToOne((type) => List, list => list.items)
+    list?: List;
 }
