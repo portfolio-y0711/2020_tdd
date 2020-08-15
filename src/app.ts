@@ -41,6 +41,7 @@ export const APP = (() => {
             saveUninitialized: true
         }));
         app.use(lusca({ csrf: true }));
+        app.use(express.static(__dirname + '/public'));
     };
 
 

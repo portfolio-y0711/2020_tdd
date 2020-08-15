@@ -7,6 +7,7 @@
     "start": "npx nodemon -e ts -i 'tsconfig.json' -x 'npx ts-node src/index.ts'",
     "pre": "npx jest pretest --config ./jest.mock.config.js --detectOpenHandles --forceExit",
     "real": "npx jest realtest --detectOpenHandles --forceExit && python3 __tests__/functest/functional_test.py",
+    "func": "python3 __tests__/functest/functional_test.py",
     "unit": "npx jest --detectOpenHandles --forceExit"
   },
   "dependencies": {
