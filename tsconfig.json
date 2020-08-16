@@ -64,7 +64,7 @@
   "include": [
     "src/**/*.ts", 
     "__tests__/**/*.test.ts",
-    "__tests__/pretest/config/mockDB.config.ts",
+    "__tests__/pretest/config/mockDB.config.ts", "__tests__/pretest/public/html/staticFiles.sample.ts",
   ],
   "exclude": [
     "node_modules", "src/__tests__"
