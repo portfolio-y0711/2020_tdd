@@ -26,7 +26,6 @@ const home_page: (options?: any) => Promise<string> = async (options?: any) => {
 
 const view_list: (options?: any) => Promise<string> = async (options?: any) => {
     const repo = getRepository(Item);
-    // const _items = await repo.find();
     let idx = 1;
     options = Object.assign({}, options, { index: () => idx++ });
     return MustacheRenderer.render('./src/views/list.mu', options);

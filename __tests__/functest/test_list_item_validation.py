@@ -1,7 +1,7 @@
 from unittest import TestCase, skip, main
 
 @skip
-class ItemVAlidationTest(TestCase):
+class ItemValidationTest(TestCase):
     def test_cannot_add_empty_list_items(self):
         self.browser.get('http://localhost:5000')
         self.get_item_input_box().send_keys('\n')

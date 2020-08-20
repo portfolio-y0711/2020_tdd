@@ -4,10 +4,11 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "npx nodemon -e ts -i 'tsconfig.json' -x 'npx ts-node src/index.ts'",
+    "start": "npx nodemon -e ts,mu -i 'tsconfig.json' -x 'npx ts-node src/index.ts'",
+    "dev": "nodemon --exec 'ts-node' bin/www.ts",
     "pre": "npx jest pretest --config ./jest.mock.config.js --detectOpenHandles --forceExit",
-    "real": "npx jest realtest --detectOpenHandles --forceExit && python3 __tests__/functest/functional_test.py",
-    "func": "python3 __tests__/functest/functional_test.py",
+    "real": "npx jest realtest --detectOpenHandles --forceExit",
+    "func": "python3 __tests__/functest/test_simple_list_creation.py",
     "unit": "npx jest --detectOpenHandles --forceExit"
   },
   "dependencies": {
@@ -18,10 +19,13 @@
     "@types/express-session": "^1.17.0",
     "@types/lusca": "^1.6.2",
     "@types/mysql": "^2.15.15",
+    "@types/nodemailer": "^6.4.0",
     "@types/should": "^13.0.0",
     "@types/sqlite3": "^3.1.6",
     "@types/testing-library__jest-dom": "^5.9.2",
+    "@types/uuid": "^8.3.0",
     "body-parser": "^1.19.0",
+    "bootstrap": "^4.5.2",
     "class-transformer": "^0.3.1",
     "class-validator": "^0.12.2",
     "cookie-parser": "^1.4.5",
@@ -32,15 +36,18 @@
     "mongoose": "^5.9.28",
     "mustache": "^4.0.1",
     "mysql": "^2.18.1",
+    "nodemailer": "^6.4.11",
     "reflect-metadata": "^0.1.13",
     "should": "^13.2.3",
+    "sinon": "^9.0.3",
     "sqlite3": "^5.0.0",
     "supertest": "^4.0.2",
     "supertest-session": "^4.0.0",
     "ts-node": "^8.10.2",
     "tsconfig-paths": "^3.9.0",
     "typeorm": "^0.2.25",
-    "typescript": "^3.9.7"
+    "typescript": "^3.9.7",
+    "uuid": "^8.3.0"
   },
   "devDependencies": {
     "@types/body-parser": "^1.19.0",
@@ -49,6 +56,7 @@
     "@types/jest": "^26.0.9",
     "@types/mongoose": "^5.7.36",
     "@types/mustache": "^4.0.1",
+    "@types/sinon": "^9.0.4",
     "@types/supertest": "^2.0.10",
     "jest": "^26.2.2",
     "ts-jest": "^26.1.4"

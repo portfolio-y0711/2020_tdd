@@ -3,7 +3,6 @@ import { Item, List } from '../../src/models/entities';
 import { getRepository } from 'typeorm';
 import { app } from '../../src/app';
 import express from 'express';
-
 const request = require('supertest-session')(app);
 
 describe('NewListTest', () => {
@@ -14,7 +13,6 @@ describe('NewListTest', () => {
             .end((err: any, res: any) => {
                 const re = new RegExp(/"_csrf"\s+value="(.+)">/);
                 token = re.exec(res.text)![1];
-                // console.log(token);
                 done();
             })
     });

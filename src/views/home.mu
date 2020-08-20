@@ -5,13 +5,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <body>
         <div class="container">
-            <div class="col-md-6 col-md-offset-3 jumbotron">
-                <div class="text-center">
+            <nav class="navbar navbar-default" role="navigation">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="/">Superlists</a>
+                    {{#user.is_authenticated}}
+                        <ul class="nav navbar-nav navbar-left">
+                            <li><a href="/lists/{{user.email}}">My lists</a></li>
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li class="navbar-text">Logged in as {{user.email}}</li>
+                            <li><a href="/accounts/logout">Log out</a></li>
+                        </ul>
+                    {{/user.is_authenticated}}
+
+                    {{ ^user.is_authenticated }}
+                    <form class="navbar-form navbar-right"
+                          method="POST"
+                          action="/accounts/send_login_email">
+                        <span>Enter email to log in:</span>
+                        <input class="form-control" name="email" type="text"/>
+                        <input type="hidden" name="_csrf" value="{{{ csrfToken }}}">
+                    </form>
+                    {{/user.is_authenticated}}
+                </div>
+            </nav>
+
+            {{#messages}}
+                <div class="row">
+                    <div class="col-md-12">
+                        {{#success}}
+                            ​<div class="alert alert-success">{{ message }}</div>
+                        {{/success}}
+                        {{#warning}}
+                            ​<div class="alert alert-danger">{{ message }}</div>
+                        {{/warning}}
+                    </div>
+                </div>
+            {{/messages}}
+
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 jumbotron">
+                    <div class="text-center">
                     <h1>Start new To-Do lists</h1>
                     <form action="/lists/new" method="post">
-                        <p style="text-align: center;"></p>
+                        <p style="text-align: center;">
+                            <input class="form-control input-lg" type="text" name="item_text" id="id_new_item" placeholder="작업 아이템 입력">
+                        </p>
                         <input type="hidden" name="_csrf" value="{{{ csrfToken }}}">
-                        <input class="form-control input-lg" type="text" name="item_text" id="id_new_item" placeholder="작업 아이템 입력">
                     </form>
                 </div>
             </div>
