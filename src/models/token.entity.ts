@@ -1,4 +1,9 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    PrimaryColumn
+} from "typeorm";
 
 @Entity()
 export class Token {
@@ -7,4 +12,7 @@ export class Token {
 
     @Column()
     email!: string;
+
+    @CreateDateColumn({ name: 'createdAt' })
+    createdAt!: Date;
 }

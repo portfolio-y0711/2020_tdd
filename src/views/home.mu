@@ -8,7 +8,7 @@
             <nav class="navbar navbar-default" role="navigation">
                 <div class="container-fluid">
                     <a class="navbar-brand" href="/">Superlists</a>
-                    {{#user.is_authenticated}}
+                    {{#user.email}}
                         <ul class="nav navbar-nav navbar-left">
                             <li><a href="/lists/{{user.email}}">My lists</a></li>
                         </ul>
@@ -16,9 +16,9 @@
                             <li class="navbar-text">Logged in as {{user.email}}</li>
                             <li><a href="/accounts/logout">Log out</a></li>
                         </ul>
-                    {{/user.is_authenticated}}
+                    {{/user.email}}
 
-                    {{ ^user.is_authenticated }}
+                    {{ ^user.email }}
                     <form class="navbar-form navbar-right"
                           method="POST"
                           action="/accounts/send_login_email">
@@ -26,7 +26,7 @@
                         <input class="form-control" name="email" type="text"/>
                         <input type="hidden" name="_csrf" value="{{{ csrfToken }}}">
                     </form>
-                    {{/user.is_authenticated}}
+                    {{/user.email}}
                 </div>
             </nav>
 

@@ -1,4 +1,4 @@
-import { List } from "../../src/models/entities";
+import { List } from "../../../src/models/entities";
 import { Entity, getRepository, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import { MinLength, Length } from 'class-validator';
 

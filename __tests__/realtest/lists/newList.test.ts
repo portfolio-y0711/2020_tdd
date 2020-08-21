@@ -1,7 +1,7 @@
 import 'should';
-import { Item, List } from '../../src/models/entities';
+import { Item, List } from '../../../src/models/entities';
 import { getRepository } from 'typeorm';
-import { app } from '../../src/app';
+import { app } from '../../../src/app';
 import express from 'express';
 const request = require('supertest-session')(app);
 

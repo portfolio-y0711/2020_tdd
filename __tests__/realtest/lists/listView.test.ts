@@ -1,7 +1,7 @@
 import 'should';
 import { getRepository } from 'typeorm';
-import { app } from '../../src/app';
-import { Item, List } from '../../src/models/entities';
+import { app } from '../../../src/app';
+import { Item, List } from '../../../src/models/entities';
 const request = require('supertest-session')(app);
 
 describe('ListViewTest', () => {

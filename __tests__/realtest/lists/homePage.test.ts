@@ -1,6 +1,6 @@
 import 'should';
-import { viewResolver } from '../../src/controllers/util';
-import { home_page } from '../../src/views';
+import { viewResolver } from '../../../src/controllers/util';
+import { home_page } from '../../../src/views';
 
 describe('HomePageTest', () => {
     it('test_root_url_resolves_to_home_page_view', () => {
