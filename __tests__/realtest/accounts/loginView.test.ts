@@ -8,15 +8,18 @@ describe('LoginView', () => {
     const sinon = require('sinon');
     let request: any;
     const dummy_login_email = async () => { };
+    const spy_login_with_user_if_there_is_one = sinon.spy();
     const fake_login = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
         const { token } = req.query;
-        const user = await spy_authenticate(token);
+        const user = await stub_authenticate(token);
         if (user) {
+            spy_login_with_user_if_there_is_one();
             req.session!.email = user.email;
         }
         res.redirect('/');
     };
-    const spy_authenticate = sinon.spy(require('../../../src/routers/accounts/service'), 'authenticate');
+    // const spy_authenticate = sinon.spy(require('../../../src/routers/accounts/service'), 'authenticate');
+    const stub_authenticate = sinon.stub(require('../../../src/routers/accounts/service'), 'authenticate');
     const real_authenticate = require('../../../src/routers/accounts/service').authenticate;
     beforeAll(() => {
         const app = express();
@@ -49,7 +52,7 @@ describe('LoginView', () => {
         request
             .get('/accounts/login?token=abcd123')        
             .then(async (res: supertest.Response) => {
-                spy_authenticate.args[0][0].should.equal('abcd123');
+                stub_authenticate.args[0][0].should.equal('abcd123');
                 done();
             })
             .catch((e: any) => {
@@ -58,9 +61,12 @@ describe('LoginView', () => {
     });
 
     it('test_calls_auth_login_with_user_if_there_is_one', (done) => {
+        spy_login_with_user_if_there_is_one.resetHistory();
+        stub_authenticate.returns({ uuid: 'abcd123', email: 'whatever@mail.com', createdAt: Date.now() })
         request
             .get('/accounts/login?token=abcd123')        
             .then(async (res: supertest.Response) => {
+                expect(spy_login_with_user_if_there_is_one.called).toBe(true);
                 done();
             })
             .catch((e: any) => {
@@ -70,9 +76,12 @@ describe('LoginView', () => {
     });
 
     it('test_does_not_login_if_user_is_not_authenticated', (done) => {
+        spy_login_with_user_if_there_is_one.resetHistory();
+        stub_authenticate.returns(null);
         request
             .get('/accounts/login?token=abcd123')        
             .then(async (res: supertest.Response) => {
+                expect(spy_login_with_user_if_there_is_one.called).toBe(false);
                 done();
             })
             .catch((e: any) => {

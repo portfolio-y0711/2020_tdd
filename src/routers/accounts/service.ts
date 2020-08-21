@@ -31,6 +31,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     if (user) {
         req.session!.email = user.email;
     }
+    req.session!.email = 'no-email';
     res.redirect('/');
 };
 

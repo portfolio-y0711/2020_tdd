@@ -5,6 +5,8 @@ import cookieParser from 'cookie-parser';
 import lusca from 'lusca';
 import session from 'express-session';
 
+const FileStore = require('session-file-store')(session);
+
 export const APP = (() => {
     const init = (() => {
         const createDbContext = async () => {
@@ -35,7 +37,8 @@ export const APP = (() => {
         app.use(session({
             secret: 'ssh, don\'t tell!',
             resave: false,
-            saveUninitialized: true
+            saveUninitialized: true,
+            store: new FileStore()
         }));
         app.use(lusca({ csrf: true }));
         app.use(express.static(__dirname + '/public'));

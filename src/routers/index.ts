@@ -15,7 +15,7 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
     const result = await viewResolver('/')(
         { 
             csrfToken: res.locals._csrf,
-            user: { email: 'yoonsung0711@gmail.com' },
+            user: { email: undefined },
             messages: [
                 { message: 'Check your email, we\'ve sent you a link you can use to log in!', success: true },
 
