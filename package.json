@@ -6,10 +6,10 @@
   "scripts": {
     "start": "npx nodemon -e ts,mu -i 'tsconfig.json' -x 'npx ts-node src/index.ts'",
     "dev": "nodemon --exec 'ts-node' bin/www.ts",
-    "pre": "npx jest pretest --config ./jest.mock.config.js --detectOpenHandles --forceExit",
-    "real": "npx jest realtest --detectOpenHandles --forceExit",
+    "pre": "npx jest pretest --config ./jest.mock.config.js --detectOpenHandles --forceExit --env jsdom",
+    "real": "npx jest realtest --detectOpenHandles --forceExit --env node",
     "func": "python3 __tests__/functest/test_simple_list_creation.py",
-    "unit": "npx jest --detectOpenHandles --forceExit"
+    "unit": "npx jest --detectOpenHandles --forceExit --env node"
   },
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.3",
@@ -25,6 +25,7 @@
     "@types/sqlite3": "^3.1.6",
     "@types/testing-library__jest-dom": "^5.9.2",
     "@types/uuid": "^8.3.0",
+    "axios": "^0.20.0",
     "body-parser": "^1.19.0",
     "bootstrap": "^4.5.2",
     "class-transformer": "^0.3.1",
@@ -33,6 +34,8 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
+    "googleapis": "^59.0.0",
+    "jsonwebtoken": "^8.5.1",
     "lusca": "^1.6.1",
     "mongoose": "^5.9.28",
     "mustache": "^4.0.1",
@@ -52,10 +55,12 @@
     "uuid": "^8.3.0"
   },
   "devDependencies": {
+    "@types/axios": "^0.14.0",
     "@types/body-parser": "^1.19.0",
     "@types/cookie-parser": "^1.4.2",
     "@types/dotenv": "^8.2.0",
     "@types/jest": "^26.0.9",
+    "@types/jsonwebtoken": "^8.5.0",
     "@types/mongoose": "^5.7.36",
     "@types/mustache": "^4.0.1",
     "@types/sinon": "^9.0.4",

@@ -18,8 +18,9 @@ describe('LoginView', () => {
         }
         res.redirect('/');
     };
-    // const spy_authenticate = sinon.spy(require('../../../src/routers/accounts/service'), 'authenticate');
-    const stub_authenticate = sinon.stub(require('../../../src/routers/accounts/service'), 'authenticate');
+    const dummy_logout = () => {};
+    // const spy_authenticate = sinon.spy(require('../../../src/routers/accounts/service'), 'emailTokenAuthenticate');
+    const stub_authenticate = sinon.stub(require('../../../src/routers/accounts/service'), 'emailTokenAuthenticate');
     const real_authenticate = require('../../../src/routers/accounts/service').authenticate;
     beforeAll(() => {
         const app = express();
@@ -30,7 +31,7 @@ describe('LoginView', () => {
             resave: false,
             saveUninitialized: true,
         }));
-        app.use('/', AccountRouter({ send_login_email: dummy_login_email, login: fake_login }));
+        app.use('/', AccountRouter({ send_login_email: dummy_login_email, login: fake_login, logout: dummy_logout }));
         request = require('supertest-session')(app);
 
     });

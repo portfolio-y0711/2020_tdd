@@ -7,11 +7,15 @@ import { AccountRouter } from '../../../src/routers/accounts';
 import { Token } from '../../../src/models/token.entity';
 import { getRepository } from 'typeorm';
 import { APP } from '../../../src/app';
+import { send_login_email } from '../../../src/routers/accounts/service';
+import sinon, { stub } from 'sinon';
+import { mailer } from '../../../src/util/nodemail';
+import { gen_token } from '../../../src/util/gen_token';
 
-describe('Spy + Fake test for sendLoginEmailView', () => {
-    const sinon = require('sinon');
+describe('sendLoginEmailViewTest with test double', () => {
+    // const sinon = require('sinon');
     let request: any;
-    const fake_send_mail = sinon.spy();
+    const fake_send_mail = sinon.stub();
     const fakeTarget = {
         send_login_email: (req: express.Request, res: express.Response) => {
             fake_send_mail('subject', 'body', 'from_email', [req.body.email]);
@@ -20,7 +24,8 @@ describe('Spy + Fake test for sendLoginEmailView', () => {
         }
     };
     const spy_send_login_email = sinon.spy(fakeTarget, 'send_login_email');
-    const dummy_login = async () => {};
+    const dummy_login = () => {};
+    const dummy_logout = () => {};
 
     beforeAll(() => {
         const app = express();
@@ -31,7 +36,7 @@ describe('Spy + Fake test for sendLoginEmailView', () => {
             resave: false,
             saveUninitialized: true,
         }));
-        app.use('/', AccountRouter({ send_login_email: spy_send_login_email, login: dummy_login }));
+        app.use('/', AccountRouter({ send_login_email: spy_send_login_email, login: dummy_login, logout: dummy_logout }));
         request = require('supertest-session')(app);
     });
 
@@ -83,74 +88,13 @@ describe('Spy + Fake test for sendLoginEmailView', () => {
 
 });
 
-describe('Spy + Real app test for sendLoginEmailView', () => {
-    const real_app = APP.init().getApp();
-    const request = require('supertest-session')(real_app);
-
-    let token: string;
-    beforeAll((done) => {
-        request
-            .get('/')
-            .end((err: any, res: any) => {
-                const re = new RegExp(/"_csrf"\s+value="(.+)">/);
-                token = re.exec(res.text)![1];
-                done();
-            })
-    });
-
-    it('test_creates_token_associated_with_email', (done) => {
-        request
-            .post('/accounts/send_login_email')
-            .type('form')
-            .send({ _csrf: token, email: 'yoonsung0711@gmail.com' })
-            .then(async (res: supertest.Response) => {
-                const token = (await getRepository(Token).find())[0];
-                token.email.should.equal('yoonsung0711@gmail.com');
-                done();
-            })
-            .catch((e: any) => {
-                done(e);
-            });
-    });
-
-    it('test_sends_link_to_login_using_token_uuid', (done) => {
-        request
-            .post('/accounts/send_login_email')
-            .type('form')
-            .send({ email: 'yoonsung0711@gmail.com' })
-            .then(async (res: supertest.Response) => {
-                const token = (await getRepository(Token).find())[0];
-                token.email.should.equal('yoonsung0711@gmail.com');
-                done();
-            })
-            .catch((e: any) => {
-                done(e);
-            });
-    });
-});
-
-describe('Spy test for sendLoginEmailView', () => {
-    const sinon = require('sinon');
-    const spy_send_mail = sinon.spy(require('../../../src/util/nodemailer'), 'send_mail');
-    const dummy_login = async () => {};
+describe('', () => {
     let request: any;
-
-
-    const spy_send_login_email = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-        const { email } = req.body;
-        const uid = uuid().toString();
-        await getRepository(Token).save({ email: email, uuid: uid });
-        const url = `http://localhost:5000/accounts/login?token=${uid}`;
-        const message_body = `Use this link to log in: ${url}`;
-        spy_send_mail(
-            'Your login link for Superlists',
-            `${message_body}`,
-            'noreply@superlists',
-            `${email}`
-        );
-        res.setHeader('message', 'Check your email, we\'ve sent you a link you can use to log in!');
-        res.redirect('/');
-    };
+    const stub_send_mail = sinon.stub(mailer, 'send_mail');
+    const stub_gen_token = sinon.stub({ gen_token }, 'gen_token');
+    stub_gen_token.returns('token1234567890');
+    const dummy_login = () => {};
+    const dummy_logout = () => {};
 
     beforeAll(() => {
         const app = express();
@@ -161,8 +105,47 @@ describe('Spy test for sendLoginEmailView', () => {
             resave: false,
             saveUninitialized: true,
         }));
-        app.use('/', AccountRouter({ send_login_email: spy_send_login_email, login: dummy_login }));
+        app.use('/', AccountRouter({
+            send_login_email: send_login_email({
+                mailer: { send_mail: stub_send_mail },
+                gen_token: stub_gen_token
+            }),
+            login: dummy_login,
+            logout: dummy_logout
+        }));
         request = require('supertest-session')(app);
+    });
+
+    it('test_creates_token', (done) => {
+        request
+            .post('/accounts/send_login_email')
+            .type('form')
+            .send({ email: 'yoonsung0711@gmail.com' })
+            .then(async (res: supertest.Response) => {
+                const token = (await getRepository(Token).find())[0];
+                stub_send_mail.called.should.equal(true);
+                token.uuid.should.equal('token1234567890');
+                done();
+            })
+            .catch((e: any) => {
+                done(e);
+            });
+    });
+
+    it('test_creates_token_associated_with_email', (done) => {
+        request
+            .post('/accounts/send_login_email')
+            .type('form')
+            .send({ email: 'yoonsung0711@gmail.com' })
+            .then(async (res: supertest.Response) => {
+                const token = (await getRepository(Token).find())[0];
+                stub_send_mail.called.should.equal(true);
+                token.email.should.equal('yoonsung0711@gmail.com');
+                done();
+            })
+            .catch((e: any) => {
+                done(e);
+            });
     });
 
     it('test_sends_link_to_login_using_token_uuid', (done) => {
@@ -171,10 +154,10 @@ describe('Spy test for sendLoginEmailView', () => {
             .type('form')
             .send({ email: 'yoonsung0711@gmail.com' })
             .then(async (res: supertest.Response) => {
-                const tokens = (await getRepository(Token).find({ order: { createdAt: 'ASC' }}));
+                const tokens = (await getRepository(Token).find({ order: { createdAt: 'ASC' } }));
                 const token = tokens[0];
                 const expected_url = `http://localhost:5000/accounts/login?token=${token.uuid}`;
-                const isContained = (spy_send_mail.args[0] as string[]).some(arg => {/* console.log(arg);console.log(arg.includes(expected_url));*/ return arg.includes(expected_url)});
+                const isContained = (stub_send_mail.args[0] as string[]).some(arg => {/* console.log(arg);console.log(arg.includes(expected_url));*/ return arg.includes(expected_url) });
                 expect(isContained).toBe(true);
                 done();
             })
@@ -182,4 +165,4 @@ describe('Spy test for sendLoginEmailView', () => {
                 done(e);
             });
     });
-});
+})

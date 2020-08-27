@@ -4,14 +4,14 @@ import sinon from 'sinon';
 describe('sinonSpyTest', () => {
     describe('sinon: sinon.spy', () => {
         it('spy.called', () => {
-            let sinonSpy = sinon.spy();
+            let sinonSpy = sinon.stub();
             expect(sinonSpy.called).toEqual(false);
             sinonSpy();
             expect(sinonSpy.called).toEqual(true);
         });
 
         it('spy.notcalled', () => {
-            let sinonSpy = sinon.spy();
+            let sinonSpy = sinon.stub();
             expect(sinonSpy.notCalled).toEqual(true);
             sinonSpy();
             expect(sinonSpy.notCalled).toEqual(false);
@@ -31,14 +31,14 @@ describe('sinonSpyTest', () => {
 describe('checking arguments', () => {
     describe('sinon', () => {
         it('spy,args', () => {
-            const sinonSpy = sinon.spy();
+            const sinonSpy = sinon.stub();
             sinonSpy(1, 2);
             sinonSpy.args[0][0].should.equal(1);
             sinonSpy.args[0][1].should.equal(2);
         });
 
         it('spy.calledWith', () => {
-            const sinonSpy = sinon.spy();
+            const sinonSpy = sinon.stub();
             sinonSpy(1, 2);
             sinonSpy.calledWith(1, 2).should.equal(true);
         });
@@ -68,7 +68,7 @@ describe('spy on method', () => {
         }
     };
     it('sinon.spy(obj, "method")', () => {
-        const sinonSpy = sinon.spy(someObject, 'getModel');
+        const sinonSpy = sinon.stub(someObject, 'getModel');
         someObject.getModel();
         expect(sinonSpy.called).toEqual(true);
         sinonSpy.restore();
