@@ -19,9 +19,9 @@ describe('LoginView', () => {
         res.redirect('/');
     };
     const dummy_logout = () => {};
-    // const spy_authenticate = sinon.spy(require('../../../src/routers/accounts/service'), 'emailTokenAuthenticate');
     const stub_authenticate = sinon.stub(require('../../../src/routers/accounts/service'), 'emailTokenAuthenticate');
     const real_authenticate = require('../../../src/routers/accounts/service').authenticate;
+
     beforeAll(() => {
         const app = express();
         app.use(express.json())
