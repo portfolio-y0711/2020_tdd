@@ -12,7 +12,7 @@
 
 1. 동기 (Motivation)
 
-2. 프로젝트를 진행하며 새롭게 습득하게 알게 된 것들
+2. 프로젝트를 진행하며 새롭게 습득하게 된 것들
 
 3. 회 고 (Retrospective)
 
@@ -163,7 +163,7 @@
 
 </details>
 
-* Google Oauth2로 two factor 인증하기  
+* Google Oauth2로 third-party 인증 서비스 사용하기 
 
     <details open>
     <summary>..(닫기)</summary>
